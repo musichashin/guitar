@@ -61,7 +61,7 @@
       max-width: 500px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       text-align: left;
-      display: none;
+      display: none; /* JS включит display: flex */
       flex-direction: column;
       min-height: 300px;
     }
@@ -74,14 +74,14 @@
     }
     .task-desc {
       color: #ccc; font-size: 16px; line-height: 1.5; margin-bottom: 20px;
-      white-space: normal; /* Текст переносится! */
+      white-space: normal; /* Текст переносится */
     }
     
-    /* Блок для ТАБОВ (только он скроллится) */
+    /* Блок для ТАБОВ */
     .tab-box {
       background: #000; border-radius: 10px; padding: 15px;
       border-left: 5px solid #ff9600; overflow-x: auto; margin-bottom: 20px;
-      display: none; /* Скрыт, если табов нет */
+      display: none; 
     }
     .tab-text {
       font-family: 'Courier New', monospace; font-size: 15px;
@@ -170,15 +170,15 @@
   </div>
 
 <script>
-  // --- НОВАЯ СТРУКТУРА ДАННЫХ (30 ДНЕЙ) ---
+  // --- БАЗА ДАННЫХ УПРАЖНЕНИЙ (30 ДНЕЙ) ---
   const exercises = [
-    // День 1
+    // День 1 (Твой обновленный текст)
     {
       dayTitle: "День 1. Знакомство",
       tasks: [
         {
           title: "Разминка: Прогулка по открытым",
-          desc: "Играй большим пальцем (P) по 6, 5, 4 струнам вниз. Только бас. Играй ровно и четко на протяжении 1 минуты.",
+          desc: "Сегодня не нужны аккорды. Играй на открытых струнах. Твоя цель — играть ровно правой рукой. Схема: Бас - 3 - 2 - 1 - 2 - 3. Делай это упражнение на протяжении 5 минут",
           tab: "e|-----------------|\nB|-----------------|\nG|-----------------|\nD|---0-------------|\nA|-------0---------|\nE|-----------0-----|\n    P   P   P"
         },
         {
@@ -483,16 +483,14 @@
   // --- ЛОГИКА ---
   let user = JSON.parse(localStorage.getItem('guitarUser')) || { xp: 0, streak: 0, lastLoginDate: null };
   const today = new Date().toDateString();
-  let currentTaskIndex = 0; // Какое сейчас задание (0, 1 или 2)
+  let currentTaskIndex = 0;
 
-  // Элементы
   const ui = {
     streak: document.getElementById('streakDisplay'),
     xp: document.getElementById('xpDisplay'),
     lockedCard: document.getElementById('lockedCard'),
     appInterface: document.getElementById('appInterface'),
     
-    // Карточка урока
     header: document.getElementById('taskHeader'),
     title: document.getElementById('taskTitle'),
     desc: document.getElementById('taskDesc'),
@@ -503,11 +501,9 @@
     dots: [document.getElementById('dot0'), document.getElementById('dot1'), document.getElementById('dot2')]
   };
 
-  // Инициализация
   ui.streak.innerText = user.streak;
   ui.xp.innerText = user.xp;
 
-  // Проверка даты
   if (user.lastLoginDate === today) {
     showLockedScreen();
   } else {
@@ -516,7 +512,8 @@
 
   function loadLesson() {
     ui.lockedCard.style.display = 'none';
-    ui.appInterface.style.display = 'flex'; // Показываем интерфейс
+    ui.appInterface.style.display = 'flex';
+    document.getElementById('lessonCard').style.display = 'flex'; // ИСПРАВЛЕНИЕ БАГА
     currentTaskIndex = 0;
     renderTask();
   }
@@ -526,12 +523,10 @@
     let dayData = exercises[dayIndex];
     let task = dayData.tasks[currentTaskIndex];
 
-    // Обновляем тексты
     ui.header.innerText = `${dayData.dayTitle} (Task ${currentTaskIndex + 1}/3)`;
     ui.title.innerText = task.title;
     ui.desc.innerText = task.desc;
     
-    // Табы (показываем только если есть)
     if (task.tab) {
       ui.tabBox.style.display = 'block';
       ui.tabText.innerText = task.tab;
@@ -539,14 +534,12 @@
       ui.tabBox.style.display = 'none';
     }
 
-    // Точки прогресса
     ui.dots.forEach((dot, idx) => {
-      dot.className = 'dot'; // сброс
+      dot.className = 'dot';
       if (idx < currentTaskIndex) dot.classList.add('completed');
       if (idx === currentTaskIndex) dot.classList.add('active');
     });
 
-    // Кнопка
     if (currentTaskIndex < 2) {
       ui.btn.innerText = "NEXT TASK";
       ui.btn.classList.remove('finish');
@@ -564,7 +557,6 @@
     if (currentTaskIndex < 2) {
       currentTaskIndex++;
       renderTask();
-      // Скролл вверх, чтобы было удобно читать новое задание
       window.scrollTo(0, 0);
     }
   }
@@ -581,7 +573,6 @@
     ui.lockedCard.style.display = 'flex';
     ui.appInterface.style.display = 'none';
     
-    // Таймер до завтра
     setInterval(() => {
       const now = new Date();
       const tomorrow = new Date(now);
