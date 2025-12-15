@@ -694,6 +694,40 @@ P (6 струна) + i, m, a (3, 2, 1 струны). Дерни все 4 стр�
     }
   }
 </script>
+<div style="position: fixed; bottom: 0; left: 0; width: 100%; background: #220000; padding: 15px; z-index: 99999; display: flex; gap: 10px; justify-content: center; border-top: 2px solid #ff0000; flex-wrap: wrap;">
+  <button onclick="adminPrev()" style="padding: 10px; background: #444; color: white; border: 1px solid white;">⬅️ Prev</button>
+  <button onclick="adminUnlock()" style="padding: 10px; background: #ff0000; color: white; border: 1px solid white; font-weight: bold;">🔓 UNLOCK</button>
+  <button onclick="adminNext()" style="padding: 10px; background: #444; color: white; border: 1px solid white;">Next ➡️</button>
+  <span id="adminInfo" style="color: white; font-weight: bold; align-self: center;"></span>
+</div>
 
+<script>
+  function adminUpdateInfo() {
+    document.getElementById('adminInfo').innerText = "Day: " + (user.streak + 1);
+  }
+
+  function adminUnlock() {
+    // Стираем дату последнего входа, будто мы еще не занимались
+    user.lastLoginDate = null;
+    localStorage.setItem('guitarUser', JSON.stringify(user));
+    location.reload();
+  }
+
+  function adminNext() {
+    user.streak++;
+    user.lastLoginDate = null; // Сразу разблокируем следующий день
+    localStorage.setItem('guitarUser', JSON.stringify(user));
+    location.reload();
+  }
+
+  function adminPrev() {
+    if (user.streak > 0) user.streak--;
+    user.lastLoginDate = null; // Разблокируем
+    localStorage.setItem('guitarUser', JSON.stringify(user));
+    location.reload();
+  }
+  
+  adminUpdateInfo();
+</script>
 </body>
 </html>
